@@ -46,7 +46,7 @@ def check_passport2(passport):
 
 f = open('input.txt')
 s = f.read()
-passport_re = re.compile(r"(?:(?:\S*:\S*\s)+\n)")
+passport_re = re.compile(r".*?\n\n", re.DOTALL)
 passports = re.findall(passport_re, s)
 print(len(passports))
 num_valid = 0
