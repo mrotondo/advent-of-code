@@ -22,6 +22,6 @@ for line in lines:
     seat_id = row * 8 + seat
     seat_ids.add(seat_id)
 print(max(seat_ids))
-for i in range(min(seat_ids), max(seat_ids)):
-    if (i not in seat_ids):
-        print(i)
+for i in seat_ids:
+    if (i+1 not in seat_ids and i+2 in seat_ids):
+        print(i+1)
