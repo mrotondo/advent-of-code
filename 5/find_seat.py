@@ -15,19 +15,13 @@ def binary_search(bisections, low_key, high_key, row_min, row_max):
 
 f = open('input.txt')
 lines = f.readlines()
-max_seat_id = 0
-min_seat_id = sys.maxsize
 seat_ids = set()
 for line in lines:
     row = binary_search(line[:7], 'F', 'B', 0, 127)
     seat = binary_search(line[7:], 'L', 'R', 0, 7)
     seat_id = row * 8 + seat
-    if (seat_id > max_seat_id):
-        max_seat_id = seat_id
-    if (seat_id < min_seat_id):
-        min_seat_id = seat_id
     seat_ids.add(seat_id)
-print(max_seat_id)
-for i in range(min_seat_id, max_seat_id):
+print(max(seat_ids))
+for i in range(min(seat_ids), max(seat_ids)):
     if (i not in seat_ids):
         print(i)
