@@ -1,17 +1,14 @@
 import sys
 
-def binary_search(bisections, low_key, high_key, row_min, row_max):
-    if (row_min == row_max):
-        return row_min
+def binary_search(bisections, low_key, high_key, min, max):
+    if (min == max):
+        return min
     bisection = bisections[0]
+    half_range = (max - min) / 2 + 1
     if (bisection == low_key):
-        return binary_search(bisections[1:], low_key, high_key, 
-                        row_min,
-                        row_max - (row_max - row_min) / 2 - 1)
+        return binary_search(bisections[1:], low_key, high_key, min, max - half_range)
     elif (bisection == high_key):
-        return binary_search(bisections[1:], low_key, high_key,
-                        row_min + (row_max - row_min) / 2 + 1,
-                        row_max)
+        return binary_search(bisections[1:], low_key, high_key, min + half_range, max)
 
 f = open('input.txt')
 lines = f.readlines()
