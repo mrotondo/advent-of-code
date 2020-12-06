@@ -4,7 +4,7 @@ def binary_search(bisections, low_key, high_key, min, max):
     if (min == max):
         return min
     bisection = bisections[0]
-    half_range = (max - min) / 2 + 1
+    half_range = (max - min) // 2 + 1
     if (bisection == low_key):
         return binary_search(bisections[1:], low_key, high_key, min, max - half_range)
     elif (bisection == high_key):
