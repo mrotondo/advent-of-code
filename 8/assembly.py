@@ -1,48 +1,44 @@
-f = open('input.txt')
-ls = f.readlines()
-
 def parse_line(l):
     return (l[:3], int(l[4:-1]))
 
-def run_program(ls):
+def execute_line(instruction, operand, program_counter, acc):
+    if (instruction == "acc"):
+        return (program_counter + 1, acc + operand)
+    elif (instruction == "jmp"):
+        return (program_counter + operand, acc)
+    elif (instruction == "nop"):
+        return (program_counter + 1, acc)
+
+def run_program(program):
     acc = 0
     executed_lines = set()
     program_counter = 0
     while(program_counter not in executed_lines):
-        if program_counter == len(ls):
+        if program_counter == len(program):
             return (True, acc)
-        elif program_counter > len(ls):
+        elif program_counter > len(program):
             return (False, acc)
-        l = ls[program_counter]
+        (instruction, operand) = program[program_counter]
         executed_lines.add(program_counter)
-        instruction, operand = parse_line(l)
-        if (instruction == "acc"):
-            acc += operand
-            program_counter += 1
-        elif (instruction == "jmp"):
-            program_counter += operand
-        elif (instruction == "nop"):
-            program_counter += 1
+        program_counter, acc = execute_line(instruction, operand, program_counter, acc)
     return (False, acc)
 
-def try_mutations(ls):
-    for i in range(len(ls)):
-        terminated, final_acc = try_mutation(ls, i)
+def try_mutations(program):
+    for i in range(len(program)):
+        terminated, final_acc = try_mutation(program, i)
         if terminated:
             return (i, terminated, final_acc)
 
-def try_mutation(ls, i):
-    instruction, operand = parse_line(ls[i])
-    new_instruction = ""
-    if instruction == "acc":
+def try_mutation(program, i):
+    (instruction, operand) = program[i]
+    mutations = {"nop": "jmp", "jmp": "nop"}
+    if instruction in mutations:
+        return run_program(program[:i] + [(mutations[instruction], operand)] + program[i+1:])
+    else:
         return (False, 0)
-    elif instruction == "jmp":
-        new_instruction = "nop"
-    elif instruction == "nop":
-        new_instruction = "jmp"
-    new_line = new_instruction + " " + str(operand) + "\n"
-    return run_program(ls[:i] + [new_line] + ls[i+1:])
 
-terminated, final_acc = run_program(ls)
-print(final_acc)
-print(try_mutations(ls))
+f = open('input.txt')
+ls = f.readlines()
+program = map(parse_line, ls)
+print(run_program(program))
+print(try_mutations(program))
