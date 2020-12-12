@@ -74,12 +74,7 @@ rules2 = {
         }
 
 while True:
-  # print('\n'.join(map(str, grid)))
-  # print('---')
-  # print(get_grid(grid, 8, 1))
-  # print(get_neighbors2(grid, 8, 1))
   num_rule_applications, new_grid = update(grid, rules2)
-  # print(num_rule_applications)
   if num_rule_applications == 0:
     break
   grid = new_grid
