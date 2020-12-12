@@ -41,7 +41,6 @@ def do_instruction(instruction, pos, waypoint):
     'R': right,
     'F': forward
   }
-
   return actions[instruction[0]](instruction[1], pos, waypoint)
 
 f = open('input.txt')
