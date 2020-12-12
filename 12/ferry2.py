@@ -16,17 +16,17 @@ def east(amount, pos, waypoint):
 def west(amount, pos, waypoint):
   return (pos, (waypoint[0] - amount, waypoint[1]))
 
-def left(amount, pos, waypoint):
-  angle = math.degrees(math.atan2(waypoint[1], waypoint[0]))
-  mag = math.sqrt(math.pow(waypoint[0], 2) + math.pow(waypoint[1], 2))
+def rotate(vec, amount):
+  angle = math.degrees(math.atan2(vec[1], vec[0]))
+  mag = math.sqrt(math.pow(vec[0], 2) + math.pow(vec[1], 2))
   new_angle = angle + amount
-  return (pos, (math.cos(math.radians(new_angle)) * mag, math.sin(math.radians(new_angle)) * mag))
+  return (math.cos(math.radians(new_angle)) * mag, math.sin(math.radians(new_angle)) * mag)
+
+def left(amount, pos, waypoint):
+  return (pos, rotate(waypoint, amount))
 
 def right(amount, pos, waypoint):
-  angle = math.degrees(math.atan2(waypoint[1], waypoint[0]))
-  mag = math.sqrt(math.pow(waypoint[0], 2) + math.pow(waypoint[1], 2))
-  new_angle = angle - amount
-  return (pos, (math.cos(math.radians(new_angle)) * mag, math.sin(math.radians(new_angle)) * mag))
+  return (pos, rotate(waypoint, -amount))
 
 def forward(amount, pos, waypoint):
   return ((pos[0] + waypoint[0] * amount, pos[1] + waypoint[1] * amount), waypoint)
