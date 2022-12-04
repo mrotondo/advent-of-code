@@ -5,23 +5,22 @@ def priority(item):
   return priority
 
 f = open('input.txt')
-lines = f.readlines()
 total_priority = 0
-for line in lines:
-  line = line.strip()
-  num_compartment_items = int(len(line)/2)
-  compartments = [set(line[:num_compartment_items]), set(line[num_compartment_items:])]
-  shared = compartments[0].intersection(compartments[1]).pop()
+for line in f:
+  num_items = len(line)//2
+  compartments = line[:num_items], line[num_items:]
+  shared = set.intersection(*map(set, compartments)).pop()
   total_priority += priority(shared)
 
 print(total_priority)
 
 total_badge_priority = 0
-num_groups = int(len(lines)/3)
 f.seek(0)
+lines = f.readlines()
+num_groups = len(lines)//3
 for i in range(num_groups):
-  group = [f.readline().strip(), f.readline().strip(), f.readline().strip()]
-  badge = set.intersection(*list(map(set,group))).pop()
+  group = map(set, map(str.strip, lines[i*3:i*3+3]))
+  badge = set.intersection(*group).pop()
   total_badge_priority += priority(badge)
 
 print(total_badge_priority)
