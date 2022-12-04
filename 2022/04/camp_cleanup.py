@@ -2,11 +2,11 @@ def parse_assignment(assignment_string):
   a,b = assignment_string.split('-')
   return int(a), int(b)
 
-def subsumes(t1, t2):
-  return t1[0] <= t2[0] and t1[1] >= t2[1]
+def subsumes(r1, r2):
+  return r1[0] <= r2[0] and r1[1] >= r2[1]
 
-def spans_min(t1, t2):
-  return t1[0] <= t2[0] and t1[1] >= t2[0]
+def spans_min(r1, r2):
+  return r1[0] <= r2[0] and r1[1] >= r2[0]
 
 f = open('input.txt')
 
