@@ -9,8 +9,7 @@ def execute_command_2(stacks, times, from_col, to_col):
   substack = []
   for _ in range(times):
     substack.append(stacks[from_col].pop())
-  for _ in range(times):
-    stacks[to_col].append(substack.pop())
+  stacks[to_col].extend(substack[::-1])
 
 f = open('input.txt')
 line = f.readline().rstrip('\n')
