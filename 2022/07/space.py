@@ -1,20 +1,5 @@
 import re
 
-class EnumWithCurrent:
-  def __init__(self, enum):
-    self.enum = enum
-    self.curr = None
-
-  def next(self):
-    try:
-      self.curr = next(self.enum)
-    except StopIteration:
-      self.curr = None
-    return self.curr
-
-  def current(self):
-    return self.curr
-
 cd_out = re.compile(r'\$ cd \.\.')
 cd_in = re.compile(r'\$ cd ([a-z\/]+)')
 ls = re.compile(r'\$ ls')
@@ -25,28 +10,23 @@ def new_dir():
   return {'dirs': {}, 'files': {}}
 
 def parse_cmd_list(cmd_list, tree):
-  while cmd := cmd_list.current():
-    if ls.search(cmd):
-      cmd_list.next()
-      parse_ls(cmd_list, tree)
-    elif match := cd_in.search(cmd):
-      cmd_list.next()
-      parse_cmd_list(cmd_list, tree['dirs'][match.group(1)])
-    elif cd_out.search(cmd):
-      cmd_list.next()
-      return
-
-def parse_ls(cmd_list, tree):
-  while cmd := cmd_list.current():
-    if match := dir_entry.search(cmd):
-      dir_name = match.group(1)
-      tree['dirs'][dir_name] = new_dir()
-    elif match := file_entry.search(cmd):
-      file_size, file_name = match.groups()
-      tree['files'][file_name] = int(file_size)
-    else:
-      return
-    cmd_list.next()
+  try:
+    while i_cmd := next(cmd_list):
+      i, cmd = i_cmd
+      if ls.search(cmd):
+        pass
+      elif match := cd_in.search(cmd):
+        parse_cmd_list(cmd_list, tree['dirs'][match.group(1)])
+      elif cd_out.search(cmd):
+        return
+      elif match := dir_entry.search(cmd):
+        dir_name = match.group(1)
+        tree['dirs'][dir_name] = new_dir()
+      elif match := file_entry.search(cmd):
+        file_size, file_name = match.groups()
+        tree['files'][file_name] = int(file_size)
+  except StopIteration:
+    return
 
 def calc_sizes(tree, all_dirs):
   total_size = 0
@@ -58,8 +38,8 @@ def calc_sizes(tree, all_dirs):
     total_size += dir_size
   return total_size
 
-cmd_list = EnumWithCurrent(open('input.txt'))
-cmd_list.next(); cmd_list.next()  # skip cd /
+cmd_list = enumerate(open('input.txt'))
+next(cmd_list)  # skip cd /
 tree = new_dir()
 parse_cmd_list(cmd_list, tree)
 
