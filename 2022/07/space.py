@@ -9,18 +9,18 @@ file_entry = re.compile(r'(\d+) ([a-z\.]+)')
 def new_dir():
   return {'dirs': {}, 'files': {}}
 
-def parse_cmd_list(cmd_list, tree):
-  for cmd in cmd_list:
-    if ls.search(cmd):
+def parse(lines, tree):
+  for line in lines:
+    if ls.search(line):
       pass
-    elif match := cd_in.search(cmd):
-      parse_cmd_list(cmd_list, tree['dirs'][match.group(1)])
-    elif cd_out.search(cmd):
+    elif match := cd_in.search(line):
+      parse(lines, tree['dirs'][match.group(1)])
+    elif cd_out.search(line):
       return
-    elif match := dir_entry.search(cmd):
+    elif match := dir_entry.search(line):
       dir_name = match.group(1)
       tree['dirs'][dir_name] = new_dir()
-    elif match := file_entry.search(cmd):
+    elif match := file_entry.search(line):
       file_size, file_name = match.groups()
       tree['files'][file_name] = int(file_size)
 
@@ -34,10 +34,10 @@ def calc_sizes(tree, all_dirs):
     total_size += dir_size
   return total_size
 
-cmd_list = open('input.txt')
-next(cmd_list)  # skip cd /
+lines = open('input.txt')
+next(lines)  # skip cd /
 tree = new_dir()
-parse_cmd_list(cmd_list, tree)
+parse(lines, tree)
 
 dirs_total_sizes = []
 total_size = calc_sizes(tree, dirs_total_sizes)
