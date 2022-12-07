@@ -10,23 +10,19 @@ def new_dir():
   return {'dirs': {}, 'files': {}}
 
 def parse_cmd_list(cmd_list, tree):
-  try:
-    while i_cmd := next(cmd_list):
-      i, cmd = i_cmd
-      if ls.search(cmd):
-        pass
-      elif match := cd_in.search(cmd):
-        parse_cmd_list(cmd_list, tree['dirs'][match.group(1)])
-      elif cd_out.search(cmd):
-        return
-      elif match := dir_entry.search(cmd):
-        dir_name = match.group(1)
-        tree['dirs'][dir_name] = new_dir()
-      elif match := file_entry.search(cmd):
-        file_size, file_name = match.groups()
-        tree['files'][file_name] = int(file_size)
-  except StopIteration:
-    return
+  for cmd in cmd_list:
+    if ls.search(cmd):
+      pass
+    elif match := cd_in.search(cmd):
+      parse_cmd_list(cmd_list, tree['dirs'][match.group(1)])
+    elif cd_out.search(cmd):
+      return
+    elif match := dir_entry.search(cmd):
+      dir_name = match.group(1)
+      tree['dirs'][dir_name] = new_dir()
+    elif match := file_entry.search(cmd):
+      file_size, file_name = match.groups()
+      tree['files'][file_name] = int(file_size)
 
 def calc_sizes(tree, all_dirs):
   total_size = 0
@@ -38,14 +34,13 @@ def calc_sizes(tree, all_dirs):
     total_size += dir_size
   return total_size
 
-cmd_list = enumerate(open('input.txt'))
+cmd_list = open('input.txt')
 next(cmd_list)  # skip cd /
 tree = new_dir()
 parse_cmd_list(cmd_list, tree)
 
 dirs_total_sizes = []
 total_size = calc_sizes(tree, dirs_total_sizes)
-dirs_total_sizes.append(total_size)
 
 at_most_100_k = [size for size in dirs_total_sizes if size <= 100_000]
 print(sum(at_most_100_k))
