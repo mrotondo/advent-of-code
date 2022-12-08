@@ -2,6 +2,7 @@ class Tree:
   def __init__(self, height):
     self.height = height
     self.visible = False
+    self.view_score = 0
     self.maxes = {(-1,0): -1, (1,0): -1, (0,-1): -1, (0,1): -1}
     self.max_up = -1
     self.max_left = -1
@@ -49,12 +50,20 @@ def sweep(trees):
       tree.max_down = max(tree.height, down_tree.max_down)
 
 def scan(trees, x, y, x_inc, y_inc):
-  tree = trees[y][x]
-  prev_tree = trees[x-x_inc][y-y_inc]
-  prev_tree_max = prev_tree.maxes[(-x_inc, -y_inc)]
-  if tree.height > prev_tree_max:
-    tree.visible = True
-  tree.maxes[(-x_inc, -y_inc)] = max(tree.height)
+  h = len(trees)
+  w = len(trees[0])
+
+  start_height = trees[y][x].height
+  view_dist = 0
+  while True:
+    x += x_inc
+    y += y_inc
+    if x < 0 or y < 0 or x >= w or y >= h:
+      break
+    view_dist += 1
+    if trees[y][x].height >= start_height:
+      break
+  return view_dist
 
 lines = open('input.txt').readlines()
 trees = [list(map(Tree, list(map(int, line.strip())))) for line in lines]
@@ -75,12 +84,26 @@ for row in trees:
   right_tree.max_right = right_tree.height
   right_tree.visible = True
 
+h = len(trees)
+w = len(trees[0])
+for y in range(0, h):
+  for x in range(0, w):
+    up_view = scan(trees, x, y, 0, -1)
+    left_view = scan(trees, x, y, -1, 0)
+    down_view = scan(trees, x, y, 0, 1)
+    right_view = scan(trees, x, y, 1, 0)
+    trees[y][x].view_score = up_view * left_view * down_view * right_view
+
 sweep(trees)
 
 num_visible = 0
+max_view_score = -1
 for row in trees:
   for tree in row:
     if tree.visible:
       num_visible += 1
+    if tree.view_score > max_view_score:
+      max_view_score = tree.view_score
 
 print(num_visible)
+print(max_view_score)
