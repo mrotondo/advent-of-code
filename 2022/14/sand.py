@@ -2,31 +2,30 @@ import sys
 
 f = open('input.txt')
 
+
+def adjust_bounds(bounds, point):
+    bounds[0][0] = min(bounds[0][0], point[0])
+    bounds[0][1] = max(bounds[0][1], point[0])
+    bounds[1][0] = min(bounds[1][0], point[1])
+    bounds[1][1] = max(bounds[1][1], point[1])
+
+
 walls = []
-min_x = sys.maxsize
-min_y = sys.maxsize
-max_x = 0
-max_y = 0
+bounds = [[sys.maxsize, 0], [sys.maxsize, 0]]
 for line in f:
     point_strings = line.split(' -> ')
     points = list(map(lambda s: tuple(map(int, s.split(','))), point_strings))
     for point in points:
-        min_x = min(min_x, point[0])
-        max_x = max(max_x, point[0])
-        min_y = min(min_y, point[1])
-        max_y = max(max_y, point[1])
+        adjust_bounds(bounds, point)
     pairs = zip(points, points[1:])
     walls.extend(pairs)
 
 source = (500, 0)
-min_x = min(min_x, source[0])
-max_x = max(max_x, source[0])
-min_y = min(min_y, source[1])
-max_y = max(max_y, source[1])
+adjust_bounds(bounds, source)
 
 # part 1: allow room for sand to fall past outermost wall pixels
-min_x -= 1
-max_x += 1
+bounds[0][0] -= 1
+bounds[0][1] += 1
 
 # part 2: floor
 # min_x -= 200
@@ -34,8 +33,8 @@ max_x += 1
 # walls.append([(min_x, max_y + 2), (max_x, max_y + 2)])
 # max_y += 2
 
-w = max_x - min_x + 1
-h = max_y - min_y + 1
+w = bounds[0][1] - bounds[0][0] + 1
+h = bounds[1][1] - bounds[1][0] + 1
 map = [['.' for _ in range(w)] for _ in range(h)]
 
 for wall in walls:
@@ -46,8 +45,8 @@ for wall in walls:
     dist = max(abs(x_diff), abs(y_diff))
     x_inc = x_diff // abs(x_diff) if x_diff != 0 else 0
     y_inc = y_diff // abs(y_diff) if y_diff != 0 else 0
-    x_start = a[0] - min_x
-    y_start = a[1] - min_y
+    x_start = a[0] - bounds[0][0]
+    y_start = a[1] - bounds[1][0]
     x = x_start
     y = y_start
     for i in range(dist + 1):
@@ -81,7 +80,8 @@ def drop_sand(map, source):
 
 num_at_rest = 0
 while True:
-    result = drop_sand(map, (source[0] - min_x, source[1] - min_y))
+    result = drop_sand(
+        map, (source[0] - bounds[0][0], source[1] - bounds[1][0]))
     if not result[1]:
         break
     num_at_rest += 1
