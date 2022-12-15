@@ -12,19 +12,10 @@ for line in f:
 
 source = (500, 0)
 
-def vec2_add(a, b):
-  return (a[0] + b[0], a[1] + b[1])
-
-def vec2_sub(a, b):
-  return (a[0] - b[0], a[1] - b[1])
-
-def get_max_y(map):
-  return max([pos[1] for pos in map])
-
 world = {}
 for wall in walls:
   a, b = wall
-  diff = vec2_sub(b, a)
+  diff = (b[0] - a[0], b[1] - a[1])
   dist = max(map(abs, diff))
   x_inc = diff[0] // abs(diff[0]) if diff[0] != 0 else 0
   y_inc = diff[1] // abs(diff[1]) if diff[1] != 0 else 0
@@ -49,15 +40,15 @@ def drop_sand(world, source, h):
         break
 
     prev_pos = pos
-    down_pos = vec2_add(pos, (0, 1))
+    down_pos = (pos[0], pos[1] + 1)
     if down_pos not in world:
       pos = down_pos
       continue
-    down_left_pos = vec2_add(pos, (-1, 1))
+    down_left_pos = (pos[0] - 1, pos[1] + 1)
     if down_left_pos not in world:
       pos = down_left_pos
       continue
-    down_right_pos = vec2_add(pos, (1, 1))
+    down_right_pos = (pos[0] + 1, pos[1] + 1)
     if down_right_pos not in world:
       pos = down_right_pos
       continue
@@ -66,7 +57,7 @@ def drop_sand(world, source, h):
   return (pos, True)
 
 num_at_rest = 0
-h = get_max_y(world)
+h = max([pos[1] for pos in world])
 while True:
   result = drop_sand(world, source, h)
   if not result[1]:
