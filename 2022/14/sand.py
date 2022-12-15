@@ -2,91 +2,79 @@ import sys
 
 f = open('input.txt')
 
-
-def adjust_bounds(bounds, point):
-    bounds[0][0] = min(bounds[0][0], point[0])
-    bounds[0][1] = max(bounds[0][1], point[0])
-    bounds[1][0] = min(bounds[1][0], point[1])
-    bounds[1][1] = max(bounds[1][1], point[1])
-
-
 walls = []
 bounds = [[sys.maxsize, 0], [sys.maxsize, 0]]
 for line in f:
-    point_strings = line.split(' -> ')
-    points = list(map(lambda s: tuple(map(int, s.split(','))), point_strings))
-    for point in points:
-        adjust_bounds(bounds, point)
-    pairs = zip(points, points[1:])
-    walls.extend(pairs)
+  point_strings = line.split(' -> ')
+  points = list(map(lambda s: tuple(map(int, s.split(','))), point_strings))
+  pairs = zip(points, points[1:])
+  walls.extend(pairs)
 
 source = (500, 0)
-adjust_bounds(bounds, source)
 
-# part 1: allow room for sand to fall past outermost wall pixels
-bounds[0][0] -= 1
-bounds[0][1] += 1
+def vec2_add(a, b):
+  return (a[0] + b[0], a[1] + b[1])
 
-# part 2: floor
-# min_x -= 200
-# max_x += 200
-# walls.append([(min_x, max_y + 2), (max_x, max_y + 2)])
-# max_y += 2
+def vec2_sub(a, b):
+  return (a[0] - b[0], a[1] - b[1])
 
-w = bounds[0][1] - bounds[0][0] + 1
-h = bounds[1][1] - bounds[1][0] + 1
-map = [['.' for _ in range(w)] for _ in range(h)]
+def get_max_y(map):
+  return max([pos[1] for pos in map])
 
+world = {}
 for wall in walls:
-    a = wall[0]
-    b = wall[1]
-    x_diff = b[0] - a[0]
-    y_diff = b[1] - a[1]
-    dist = max(abs(x_diff), abs(y_diff))
-    x_inc = x_diff // abs(x_diff) if x_diff != 0 else 0
-    y_inc = y_diff // abs(y_diff) if y_diff != 0 else 0
-    x_start = a[0] - bounds[0][0]
-    y_start = a[1] - bounds[1][0]
-    x = x_start
-    y = y_start
-    for i in range(dist + 1):
-        map[y][x] = '#'
-        x += x_inc
-        y += y_inc
+  a, b = wall
+  diff = vec2_sub(b, a)
+  dist = max(map(abs, diff))
+  x_inc = diff[0] // abs(diff[0]) if diff[0] != 0 else 0
+  y_inc = diff[1] // abs(diff[1]) if diff[1] != 0 else 0
+  x, y = a
+  for i in range(dist + 1):
+    world[(x, y)] = '#'
+    x += x_inc
+    y += y_inc
 
+def drop_sand(world, source, h):
+  if source in world and world[source] == 'o':
+    return (source, False)
 
-def drop_sand(map, source):
-    # part 2 source obscured check
-    if map[source[1]][source[0]] == 'o':
-        return (source, False)
+  pos = source
+  prev_pos = None
+  while prev_pos != pos:
+    if pos[1] == h + 2:
+      return (pos, False)
+    prev_pos = pos
+    down_pos = vec2_add(pos, (0, 1))
+    down_left_pos = vec2_add(pos, (-1, 1))
+    down_right_pos = vec2_add(pos, (1, 1))
+    if down_pos not in world:
+      pos = down_pos
+    elif down_left_pos not in world:
+      pos = down_left_pos
+    elif down_right_pos not in world:
+      pos = down_right_pos
 
-    h = len(map)
-    pos = source
-    prev_pos = None
-    while prev_pos != pos:
-        prev_pos = pos
-        if map[pos[1] + 1][pos[0]] == '.':
-            pos = (pos[0], pos[1] + 1)
-        elif map[pos[1] + 1][pos[0] - 1] == '.':
-            pos = (pos[0] - 1, pos[1] + 1)
-        elif map[pos[1] + 1][pos[0] + 1] == '.':
-            pos = (pos[0] + 1, pos[1] + 1)
-        if pos[1] == h - 1:
-            return (pos, False)
+    # part 2
+    if pos[1]+1 == h + 2:
+        break
 
-    map[pos[1]][pos[0]] = 'o'
-    return (pos, True)
-
+  world[pos] = 'o'
+  return (pos, True)
 
 num_at_rest = 0
+h = get_max_y(world)
 while True:
-    result = drop_sand(
-        map, (source[0] - bounds[0][0], source[1] - bounds[1][0]))
-    if not result[1]:
-        break
-    num_at_rest += 1
+  result = drop_sand(world, source, h)
+  if not result[1]:
+    break
+  num_at_rest += 1
 
-# print(f'bounds:{min_x}, {min_y} - {max_x}, {max_y}')
-# for row in map:
-#     print(row)
+for y in range(*bounds[1]):
+  row = ''
+  for x in range(*bounds[0]):
+    if (x, y) in world:
+      row += world[(x, y)]
+    else:
+      row += '.'
+  print(row)
 print(num_at_rest)
