@@ -48,8 +48,12 @@ for wall in walls:
     y_inc = y_diff // abs(y_diff) if y_diff != 0 else 0
     x_start = a[0] - min_x
     y_start = a[1] - min_y
+    x = x_start
+    y = y_start
     for i in range(dist + 1):
-        map[y_start + i * y_inc][x_start + i * x_inc] = '#'
+        map[y][x] = '#'
+        x += x_inc
+        y += y_inc
 
 
 def drop_sand(map, source):
