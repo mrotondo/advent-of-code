@@ -34,6 +34,7 @@ for wall in walls:
     x += x_inc
     y += y_inc
 
+# @profile
 def drop_sand(world, source, h):
   if source in world and world[source] == 'o':
     return (source, False)
@@ -43,20 +44,23 @@ def drop_sand(world, source, h):
   while prev_pos != pos:
     if pos[1] == h + 2:
       return (pos, False)
-    prev_pos = pos
-    down_pos = vec2_add(pos, (0, 1))
-    down_left_pos = vec2_add(pos, (-1, 1))
-    down_right_pos = vec2_add(pos, (1, 1))
-    if down_pos not in world:
-      pos = down_pos
-    elif down_left_pos not in world:
-      pos = down_left_pos
-    elif down_right_pos not in world:
-      pos = down_right_pos
-
     # part 2
     if pos[1]+1 == h + 2:
         break
+
+    prev_pos = pos
+    down_pos = vec2_add(pos, (0, 1))
+    if down_pos not in world:
+      pos = down_pos
+      continue
+    down_left_pos = vec2_add(pos, (-1, 1))
+    if down_left_pos not in world:
+      pos = down_left_pos
+      continue
+    down_right_pos = vec2_add(pos, (1, 1))
+    if down_right_pos not in world:
+      pos = down_right_pos
+      continue
 
   world[pos] = 'o'
   return (pos, True)
