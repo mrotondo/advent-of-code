@@ -25,19 +25,17 @@ min_y = min(min_y, source[1])
 max_y = max(max_y, source[1])
 
 # part 1: allow room for sand to fall past outermost wall pixels
-# min_x -= 1
-# max_x += 1
+min_x -= 1
+max_x += 1
 
 # part 2: floor
-min_x -= 200
-max_x += 200
-walls.append([(min_x, max_y + 2), (max_x, max_y + 2)])
-max_y += 2
+# min_x -= 200
+# max_x += 200
+# walls.append([(min_x, max_y + 2), (max_x, max_y + 2)])
+# max_y += 2
 
 w = max_x - min_x + 1
 h = max_y - min_y + 1
-print(f'min_x: {min_x}, max_x: {max_x}')
-print(f'w: {w}, h: {h}')
 map = [['.' for _ in range(w)] for _ in range(h)]
 
 for wall in walls:
@@ -84,8 +82,7 @@ while True:
         break
     num_at_rest += 1
 
-print(walls)
-print(f'bounds:{min_x}, {min_y} - {max_x}, {max_y}')
-for row in map:
-    print(row)
+# print(f'bounds:{min_x}, {min_y} - {max_x}, {max_y}')
+# for row in map:
+#     print(row)
 print(num_at_rest)
