@@ -64,7 +64,6 @@ class World:
 def vec2_add(a, b):
   return (a[0] + b[0], a[1] + b[1])
 
-# @profile
 def drop_blocks(world, jets, max_blocks):
   max_y = 0
   skip_y = 0
@@ -76,22 +75,14 @@ def drop_blocks(world, jets, max_blocks):
   while num_blocks < max_blocks:
     if not skipped and (block_i, jet_i) in block_jet_lineups and len(block_jet_lineups[(block_i, jet_i)]) == 2:
       prev_num_blocks, prev_max_y = block_jet_lineups[(block_i, jet_i)][1]
-      print(f'oh hey! weve been at block {block_i}, jet {jet_i} before...')
-      print(f'prev_num_blocks is {prev_num_blocks} and prev_max_y is {prev_max_y}')
-      print(f'num_blocks is now {num_blocks} and max_y is now {max_y}')
-      print('skipping to the end...')
       num_blocks_increment = num_blocks - prev_num_blocks
       max_y_increment = max_y - prev_max_y
-      print(f'num_blocks_increment is {num_blocks_increment} and max_y_increment is {max_y_increment}')
       times_to_increment = (max_blocks - num_blocks) // num_blocks_increment
-      print(f'times to increment is {times_to_increment}')
       num_blocks += num_blocks_increment * times_to_increment
       skip_y = times_to_increment * max_y_increment
-      print(f'num_blocks is now {num_blocks} and skip_y is now {skip_y}')
       skipped = True
     else:
       block_jet_lineups.setdefault((block_i, jet_i), []).append((num_blocks, max_y))
-      # block_jet_lineups[(block_i, jet_i)] = (num_blocks, max_y)
 
     block = copy(block_templates[block_i])
     block.position = (2, max_y + 3)
@@ -121,9 +112,6 @@ def drop_blocks(world, jets, max_blocks):
 f = open('input.txt')
 jets = f.readline().strip()
 # max_blocks = 2022
-# max_blocks = 10000
-max_blocks = 100000
-# max_blocks = 1000000
 max_blocks = 1000000000000
 world = World()
 max_y = drop_blocks(world, jets, max_blocks)
