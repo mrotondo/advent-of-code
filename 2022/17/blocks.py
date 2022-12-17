@@ -26,7 +26,7 @@ class World:
     self.pieces = set()
     self.max_ys = [0] * 7
   
-  @profile
+  # @profile
   def check_block_move(self, block, move):
     for block_piece in block.pieces:
       translated_piece = vec2_add(block_piece, block.position)
@@ -67,10 +67,32 @@ def vec2_add(a, b):
 # @profile
 def drop_blocks(world, jets, max_blocks):
   max_y = 0
+  skip_y = 0
+  skipped = False
   num_blocks = 0
   jet_i = 0
   block_i = 0
+  block_jet_lineups = {}
   while num_blocks < max_blocks:
+    if not skipped and (block_i, jet_i) in block_jet_lineups and len(block_jet_lineups[(block_i, jet_i)]) == 2:
+      prev_num_blocks, prev_max_y = block_jet_lineups[(block_i, jet_i)][1]
+      print(f'oh hey! weve been at block {block_i}, jet {jet_i} before...')
+      print(f'prev_num_blocks is {prev_num_blocks} and prev_max_y is {prev_max_y}')
+      print(f'num_blocks is now {num_blocks} and max_y is now {max_y}')
+      print('skipping to the end...')
+      num_blocks_increment = num_blocks - prev_num_blocks
+      max_y_increment = max_y - prev_max_y
+      print(f'num_blocks_increment is {num_blocks_increment} and max_y_increment is {max_y_increment}')
+      times_to_increment = (max_blocks - num_blocks) // num_blocks_increment
+      print(f'times to increment is {times_to_increment}')
+      num_blocks += num_blocks_increment * times_to_increment
+      skip_y = times_to_increment * max_y_increment
+      print(f'num_blocks is now {num_blocks} and skip_y is now {skip_y}')
+      skipped = True
+    else:
+      block_jet_lineups.setdefault((block_i, jet_i), []).append((num_blocks, max_y))
+      # block_jet_lineups[(block_i, jet_i)] = (num_blocks, max_y)
+
     block = copy(block_templates[block_i])
     block.position = (2, max_y + 3)
     while True:
@@ -93,15 +115,16 @@ def drop_blocks(world, jets, max_blocks):
         break
     num_blocks += 1
     block_i = (block_i + 1) % len(block_templates)
-  return max_y
+  return max_y + skip_y
 
 
 f = open('input.txt')
 jets = f.readline().strip()
 # max_blocks = 2022
+# max_blocks = 10000
 max_blocks = 100000
 # max_blocks = 1000000
-# max_blocks = 1000000000000
+max_blocks = 1000000000000
 world = World()
 max_y = drop_blocks(world, jets, max_blocks)
 print(max_y)
