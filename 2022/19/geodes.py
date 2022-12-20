@@ -25,12 +25,18 @@ def pay_for(blueprint, stocks, robot):
   for ingredient in blueprint[robot]:
     stocks[ingredient] -= blueprint[robot][ingredient]
 
+def build(blueprint, robots, stocks, robot):
+  pay_for(blueprint, stocks, robot)
+  robots[robot] += 1
+
 def add_into_second_dict(d1, d2):
   for k, v in d1.items():
     d2[k] += v
 
-def find_earliest_geo(blueprint, robots_start, stocks_start):
-  worlds = [{'robots': copy.copy(robots_start), 'stocks': copy.copy(stocks_start), 't': 0, 'history': []}]
+def find_earliest_geo(blueprint):
+  robots_start = {'ore': 1, 'cla': 0, 'obs': 0, 'geo': 0}
+  stocks_start = {'ore': 0, 'cla': 0, 'obs': 0, 'geo': 0}
+  worlds = [{'robots': robots_start, 'stocks': stocks_start, 't': 0, 'history': []}]
   while not any([world['stocks']['geo'] > 0 for world in worlds]):
     # build new robots
     new_worlds = []
@@ -63,10 +69,21 @@ def find_earliest_geo(blueprint, robots_start, stocks_start):
               ]
   
   return [world for world in worlds if world['stocks']['geo'] > 0]
-    
-    
-robots_start = {'ore': 1, 'cla': 0, 'obs': 0, 'geo': 0}
-stocks_start = {'ore': 0, 'cla': 0, 'obs': 0, 'geo': 0}
-for blueprint in blueprints:
-  print(find_earliest_geo(blueprint, robots_start, stocks_start))
-  
+
+def run_greedy(blueprint):
+  robots = {'ore': 1, 'cla': 0, 'obs': 0, 'geo': 0}
+  stocks = {'ore': 0, 'cla': 0, 'obs': 0, 'geo': 0}
+  for t in range(24):
+    print(t)
+    for robot in ['geo', 'obs', 'cla', 'ore']:
+      if can_build(blueprint, stocks, robot):
+        build(blueprint, robots, stocks, robot)
+        break
+    add_into_second_dict(robots, stocks)
+  print(robots)
+  print(stocks)
+  return stocks['geo']
+
+for i, blueprint in enumerate(blueprints):
+  # print(find_earliest_geo(blueprint))
+  print(i * run_greedy(blueprint))
