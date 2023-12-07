@@ -41,14 +41,9 @@ for line in f.readlines():
   hand, bid = re.search(r'([AKQJT2-9]{5}) (\d+)', line).groups()
   hands.append((hand, int(bid)))
 
-hands.sort(key=functools.cmp_to_key(lambda h1, h2: compare_hands(h1[0], h2[0])))
-total_winnings = 0
-for idx, (hand, bid) in enumerate(hands):
-  total_winnings += bid * (idx + 1)
-print(total_winnings)
-
-hands.sort(key=functools.cmp_to_key(lambda h1, h2: compare_hands(h1[0], h2[0], part_2=True)))
-total_winnings = 0
-for idx, (hand, bid) in enumerate(hands):
-  total_winnings += bid * (idx + 1)
-print(total_winnings)
+for part_2 in [False, True]:
+  hands.sort(key=functools.cmp_to_key(lambda h1, h2: compare_hands(h1[0], h2[0], part_2=part_2)))
+  total_winnings = 0
+  for idx, (hand, bid) in enumerate(hands):
+    total_winnings += bid * (idx + 1)
+  print(total_winnings)
