@@ -1,12 +1,13 @@
 import re
 import functools
 import operator
+from collections import defaultdict
 
 RANKED_COUNTS = ['5', '41', '32', '311', '221', '2111', '11111']
 def hand_type(hand, jokers=False):
-  counts = {}
+  counts = defaultdict(int)
   for card in hand:
-    counts[card] = counts.setdefault(card, 0) + 1
+    counts[card] += 1
   if jokers:
     if hand == 'JJJJJ':
       return 0
