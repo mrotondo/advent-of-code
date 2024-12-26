@@ -18,15 +18,15 @@ def count_border_neighbors(grid, region, coords_to_regions):
   height = len(grid)
   width = len(grid[0])
   
-  border_neighbors = {}
+  border_neighbors = set()
   for x, y in region:
     neighbor_offsets = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-    for x_offset, y_offset in neighbor_offsets:
-      neighbor = (x + x_offset, y + y_offset)
+    for neighbor_offset in neighbor_offsets:
+      neighbor = (x + neighbor_offset[0], y + neighbor_offset[1])
       if neighbor not in coords_to_regions or coords_to_regions[neighbor] != region:
-        border_neighbors[neighbor] = border_neighbors.setdefault(neighbor, 0) + 1
+        border_neighbors.add((neighbor, neighbor_offset))
   
-  return sum(border_neighbors.values())
+  return len(border_neighbors)
 
 f = open('input.txt')
 grid = [line.strip() for line in f.readlines()]
