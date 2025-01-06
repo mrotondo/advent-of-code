@@ -17,6 +17,14 @@ def combo_operand_value(combo_operand, registers):
     case _:
       raise ValueError
 
+# 1: write A % 8 to B (A:41644071 => B:7)
+# 2: write B ^ 2 to B (B:7 => B:5)
+# 3: write int(A / 2^B) to C (A:41644071, B:5 => C:1301377)
+# 4: write B ^ 7 to B (B:5 => B:2)
+# 5: write B ^ C to B (B:2, C: 1301377 => B:1301379)
+# 6: write int(A / 8) to A (A:41644071 => A:5205508)
+# 7: output B % 8 (B:1301379 => "3")
+
 output = ""
 instruction_pointer = 0
 while instruction_pointer < len(program):
