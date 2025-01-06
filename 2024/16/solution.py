@@ -1,8 +1,6 @@
 from enum import Enum
 import math
-import sys
-
-sys.setrecursionlimit(15000)
+import heapq
 
 class Node:
   def __init__(self, x, y, direction):
@@ -14,6 +12,9 @@ class Node:
   
   def __repr__(self):
     return self.label
+  
+  def __lt__(self, other):
+    return self.x < other.x
 
 class Direction(Enum):
   NORTH = 0
@@ -42,24 +43,36 @@ class Tile:
     departure_start_node.transitions.append((1, departure_end_node))
     return_start_node.transitions.append((1, return_end_node))
 
-def search(node, goal_nodes, visited_nodes, cost_so_far=0):
-  if node in goal_nodes:
-    return (cost_so_far, [[node]])
-  elif node in visited_nodes and visited_nodes[node] < cost_so_far:
-    return (math.inf, [[]])
-  else:
-    visited_nodes[node] = cost_so_far
-    paths = []
-    for transition_cost, to_node in node.transitions:
-      cost, all_shortest_paths = search(to_node, goal_nodes, visited_nodes, cost_so_far + transition_cost)
-      for path in all_shortest_paths:
-        paths.append((cost, [node] + path))
-    if len(paths) > 0:
-      min_cost = min([cost for cost, _ in paths])
-      shortest_paths = [path for cost, path in paths if cost == min_cost]
-      return (min_cost, shortest_paths)
+def search(node, goal_nodes):
+  goal_x, goal_y = goal_nodes[0].x, goal_nodes[0].y
+  heuristic = lambda node: abs(node.x - goal_x) + abs(node.y - goal_y) + node.direction.value * 0.1
+  
+  frontier = []
+  heapq.heappush(frontier, (heuristic(node), 0, [node]))
+
+  lowest_path_cost_to_nodes = {node: 0}
+  lowest_path_cost_to_goal = math.inf
+  shortest_paths_to_goal = []
+  
+  while len(frontier) > 0:
+    _, path_cost, path = heapq.heappop(frontier)
+    node = path[-1]
+    if path_cost > lowest_path_cost_to_goal:
+      continue
+    elif node in goal_nodes:
+      if path_cost == lowest_path_cost_to_goal:
+        shortest_paths_to_goal.append(path)
+      elif path_cost < lowest_path_cost_to_goal:
+        shortest_paths_to_goal = [path]
+        lowest_path_cost_to_goal = path_cost
+    elif node in lowest_path_cost_to_nodes and lowest_path_cost_to_nodes[node] < path_cost:
+      continue
     else:
-      return (math.inf, [[]])
+      lowest_path_cost_to_nodes[node] = path_cost
+      for transition_cost, transition_destination in node.transitions:
+        cost_to_destination = path_cost + transition_cost
+        heapq.heappush(frontier, (heuristic(transition_destination), cost_to_destination, path + [transition_destination]))
+  return lowest_path_cost_to_goal, shortest_paths_to_goal
 
 input_file = open("input.txt")
 grid = [line.strip() for line in input_file.readlines()]
@@ -88,9 +101,8 @@ for y in range(height):
       elif tile_character == "E":
         end_nodes = tile.direction_facing_nodes
 
-cost, all_shortest_paths = search(start_node, end_nodes, {})
+cost, shortest_paths = search(start_node, end_nodes)
 print(cost)
-for node in all_shortest_paths[0]:
-  print(node)
-tiles_in_shortest_paths = [(node.x, node.y) for path in all_shortest_paths for node in path]
+
+tiles_in_shortest_paths = [(node.x, node.y) for path in shortest_paths for node in path]
 print(len(set(tiles_in_shortest_paths)))
