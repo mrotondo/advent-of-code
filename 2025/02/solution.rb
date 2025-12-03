@@ -11,16 +11,12 @@ def invalid_id(id)
     all_chunks_match = true
     chunks = id
     chunks_length = Math.log10(chunks).to_i + 1
-    first_chunk = nil
+    comparison_chunk = id %  10 ** repetition_length
     (repetition_count - 1).times do
       chunk = chunks / 10 ** (chunks_length - repetition_length)
-      if first_chunk == nil
-        first_chunk = chunk
-      else
-        if first_chunk != chunk
-          all_chunks_match = false
-          break
-        end
+      if chunk != comparison_chunk
+        all_chunks_match = false
+        break
       end
       chunks = chunks % 10 ** (chunks_length - repetition_length)
       chunks_length -= repetition_length
