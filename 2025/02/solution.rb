@@ -2,9 +2,9 @@ require "benchmark"
 
 path = File.join(File.dirname(__FILE__), "input.txt")
 
-def invalid_id(id, max_repetitions: id.to_s.length)
-  repetitions_to_check = (2..max_repetitions)
-  id_length = id.to_s.length
+def invalid_id(id)
+  id_length = Math.log10(id).to_i + 1
+  repetitions_to_check = (2..id_length)
   repetitions_to_check.each do |repetition_count|
     next if id_length % repetition_count != 0
     repetition_length = id_length / repetition_count
@@ -21,10 +21,10 @@ def invalid_id(id, max_repetitions: id.to_s.length)
       chunks_length -= repetition_length
     end
     if all_chunks_match
-      return true
+      return repetition_count
     end
   end
-  false
+  nil
 end
 
 part_1_invalid_id_sum = 0
@@ -34,10 +34,11 @@ time = Benchmark.measure do
   ranges.each do |range|
     min, max = range.split("-")
     (min.to_i..max.to_i).each do |id|
-      if invalid_id(id, max_repetitions: 2)
+      repetitions_found = invalid_id(id)
+      if repetitions_found == 2
         part_1_invalid_id_sum += id
       end
-      if invalid_id(id)
+      if repetitions_found != nil
         part_2_invalid_id_sum += id
       end
     end
