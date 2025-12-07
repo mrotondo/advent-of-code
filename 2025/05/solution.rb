@@ -52,5 +52,4 @@ while unioned_ranges.any? { |r1| unioned_ranges.any? { |r2| ranges_intersect(r1,
   unioned_ranges = new_unioned_ranges
 end
 
-puts "part 2: #{unioned_ranges}"
 puts "part 2: #{unioned_ranges.sum { |range| range.size }}"
