@@ -1,10 +1,5 @@
-require "chunky_png"
-
 def rect_size(p1, p2)
-  min_x, max_x = [p1[0], p2[0]].minmax
-  min_y, max_y = [p1[1], p2[1]].minmax
-
-  (max_x - min_x + 1) * (max_y - min_y + 1)
+  ((p1[0] - p2[0]).abs + 1) * ((p1[1] - p2[1]).abs + 1)
 end
 
 def biggest_rect(p, positions)
